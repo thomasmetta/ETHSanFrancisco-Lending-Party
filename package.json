@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@bloomprotocol/share-kit": "^1.1.1",
+    "@makerdao/dai": "^0.9.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-redux": "^5.0.7",
