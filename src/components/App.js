@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Button, Container, Divider, Grid, Header, Image, Menu, Segment } from 'semantic-ui-react'
+
 import logo from '../logo.svg';
 import './App.css';
 import StartButton from './StartButton.js';
@@ -29,15 +31,15 @@ class App extends Component {
 
   render() {
     return (
+      <Container style={{ marginTop: '3em' }}>
+        <Header as='h1'>Maker CDPs</Header>
+        <StartButton/>
+
+      {/*
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">MakerJS React Redux Example</h1>
-        </header>
           <br/>
           <BloomQRComponent/>
           <br/>
-          <StartButton/>
           <br /><p className="App-intro"><strong>This application pulls in maker.js to open a cdp, lock eth, draw dai, repay the dai, and then shut the cdp.  Each transaction is sent after the other is mined.  Progress is reported below.  Click Start to begin.</strong></p><br />
           <CreateMaker/>
           <AuthenticateMaker/>
@@ -47,6 +49,8 @@ class App extends Component {
           <WipeDebt/>
           <ShutCdp/>
       </div>
+      */}
+      </Container>
     );
   }
 }

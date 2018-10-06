@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { startAsync } from '../actions';
+import { Button } from 'semantic-ui-react'
 
 const mapStateToProps = state => {
   return {
@@ -19,9 +20,9 @@ function mapDispatchToProps(dispatch) {
 const StartButton = ({ started, start}) => {
 
   return (
-      <button onClick={start}>
+      <Button primary onClick={start}>
         {started ? 'Restart' : 'Start'}
-      </button>
+      </Button>
     );
 }
 

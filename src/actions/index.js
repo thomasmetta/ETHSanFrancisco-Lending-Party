@@ -77,6 +77,26 @@ export const startAsync = () => async dispatch => {
   await maker.authenticate();
   dispatch(makerAuthenticated());
 
+  // get the CDP
+  const cdp = await maker.getCdp(2824);
+  console.dir(cdp);
+
+  const collateralValue = await cdp.getCollateralValue();
+  console.log("collateralValue = " + collateralValue);
+
+  const dai = maker.service('token').getToken('ETH');
+
+  const defaultAccount = maker.service('token').get('web3').currentAccount();
+
+  //const tokenService = maker.service('token').getToken('ETH');
+  //console.dir(tokenService);
+
+  //const balance = await dai.balanceOf(defaultAccount);
+  //console.log("current eth balance: " + balance);
+
+
+
+/*
   const cdp = await maker.openCdp();
   console.log('cdp:', cdp);
   dispatch(cdpOpened());
@@ -86,4 +106,5 @@ export const startAsync = () => async dispatch => {
   await dispatch(drawDaiAsync(maker, cdp));
   await dispatch(wipeDebtAsync(maker, cdp));
   await dispatch(shutCdpAsync(cdp));
+  */
 };
