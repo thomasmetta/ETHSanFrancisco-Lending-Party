@@ -34,8 +34,9 @@ export const cdpShut = () => ({
 
 const drawDaiAsync = (maker, cdp) => async dispatch => {
   const defaultAccount = maker
-    .service('web3')
-    .defaultAccount();
+    .service('token')
+    .get('web3')
+    .currentAccount();
   const dai = maker.service('token').getToken('DAI');
   const txn = await cdp.drawDai(0.1);
   const balance = await dai.balanceOf(defaultAccount);
@@ -46,8 +47,9 @@ const drawDaiAsync = (maker, cdp) => async dispatch => {
 
 const wipeDebtAsync = (maker, cdp) => async dispatch => {
   const defaultAccount = maker
-    .service('web3')
-    .defaultAccount();
+    .service('token')
+    .get('web3')
+    .currentAccount();
   const dai = maker.service('token').getToken('DAI');
   const txn = await cdp.wipeDai(0.1);
   const balance = await dai.balanceOf(defaultAccount);
