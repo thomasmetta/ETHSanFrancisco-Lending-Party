@@ -21,13 +21,13 @@ import Maker from '@makerdao/dai';
 import { calcMaxDebtInCDP, calcMaxDebtFromWallet} from '../actions';
 import io from 'socket.io-client';
 
-const socket = io("localhost:8000");
+const socket = io("https://99aba3de.ngrok.io");
 
 const BloomQRComponent: React.SFC = props => {
   const requestData = {
   action: "request_attestation_data",
   token: '0x8f31e48a585fd12ba58e70e03292cac712cbae39bc7eb980ec189aa88e24d041',
-  url: 'https://78651dda.ngrok.io/',
+  url: 'https://99aba3de.ngrok.io',
   org_logo_url: 'https://bloom.co/images/notif/bloom-logo.png',
   org_name: 'Bloom',
   org_usage_policy_url: 'https://bloom.co/legal/terms',
