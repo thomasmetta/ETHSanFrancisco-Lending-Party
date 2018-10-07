@@ -13,8 +13,7 @@ class FundFromWalletDialog extends Component {
   close = () => this.setState({ open: false })
 
   confirm = () => {
-    console.log("confirmed");
-
+    this.props.onConfirmTransfer(true);
     this.setState({ open: false })
   }
 

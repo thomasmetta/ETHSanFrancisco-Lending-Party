@@ -43,15 +43,21 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false, showDialog: false};
+    this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false, showDialog: false,
+      neededEth: 0, usd: 0};
     this.handleClick = this.handleClick.bind(this);
     this.scrollClick = this.scrollClick.bind(this);
     this.onChange = this.onChange.bind(this);
     this.myRef = React.createRef();
+    this.handleConfirmTransfer = this.handleConfirmTransfer.bind(this);
   }
 
   onChange(event) {
      this.setState({inputAmount: event.target.value});
+  }
+
+  handleConfirmTransfer(val) {
+      console.log("confirmed!");
   }
 
   scrollClick() {
@@ -66,9 +72,8 @@ class App extends Component {
     if (!amount || amount == '' || parseFloat(amount <= 0)) {
       return; // no input
     }
-    this.setState({
-      showDialog: true
-    });
+    amount = parseFloat(amount);
+
     const maker = Maker.create("kovan", {
       privateKey: process.env['REACT_APP_PRIVATE_KEY'],
       overrideMetamask: true
@@ -77,7 +82,7 @@ class App extends Component {
     let cdpId = process.env['REACT_APP_CDP_ID'];
     const cdp = await maker.getCdp(cdpId ? parseInt(cdpId) : 2836);
 
-    await drawDaiAsync(maker,cdp, amount);
+    //await drawDaiAsync(maker,cdp, amount);
 
     const daiDebt = await cdp.getDebtValue();
     const daiDebtString = daiDebt._amount.toString();
@@ -85,10 +90,24 @@ class App extends Component {
     const calculatedMaxDebt = maxDebt-daiDebtString;
     const maxDebtFromWallet = await calcMaxDebtFromWallet(maker, cdp);
     const maxDebtCombined = calculatedMaxDebt + maxDebtFromWallet;
+
+    // if the requested amount is greater than what's available in the CDP
+    // bring up the confirmation dialog
+    // otherwise, continue
+    if (amount > maxDebt) {
+      this.setState({
+        neededEth: 10,
+        usd: 20,
+        showDialog: true
+      });
+      return;
+    }
+
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
       maxDebtCombined: Math.round(maxDebtCombined*100)/100,
     });
+
   }
 
   async componentDidMount() {
@@ -176,7 +195,7 @@ class App extends Component {
           Amount in USD to loan: <Input focus placeholder=''onChange={this.onChange} />
           <Button onClick={()=>this.handleClick(this.state.inputAmount)}>Go</Button>
           {this.state.showDialog &&
-            <FundFromWalletDialog neededEth="10" usd="20"/>
+            <FundFromWalletDialog neededEth={this.state.neededEth} usd={this.state.usd} onConfirm={this.handleConfirmTransfer}/>
           }
           <Divider/>
           </div>
