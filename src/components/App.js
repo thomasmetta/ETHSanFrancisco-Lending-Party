@@ -76,7 +76,6 @@ class App extends Component {
   }
 
   async handleClick(amount) {
-    console.log(amount)
     if (!amount || amount == '' || parseFloat(amount) <= 0) {
       return; // no input
     }
@@ -109,7 +108,6 @@ class App extends Component {
 
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
-      percentage: calculatedMaxDebt/maxDebtCombined*100,
       maxDebtCombined: Math.round(maxDebtCombined*100)/100,
     });
 
@@ -139,7 +137,6 @@ class App extends Component {
 
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
-      percentage: calculatedMaxDebt/maxDebtCombined*100,
       maxDebtCombined: Math.round(maxDebtCombined*100)/100
     });
   }
@@ -174,7 +171,7 @@ class App extends Component {
     const newValue = e.target.value;
     this.setState(() => ({
       percentage: Number(newValue),
-      valueToSubmit: parseFloat(Number(newValue) / 100 * this.state.maxDebtCombined).toFixed(2) - this.state.maxDebt
+      valueToSubmit: parseFloat(Number(newValue) / 100 * this.state.maxDebtCombined).toFixed(2)
     }));
   }
 
@@ -236,7 +233,7 @@ class App extends Component {
                 lineWidth={20}
                 animate
                 />
-                Collatoralize: ${parseFloat(this.state.percentage/100 * this.state.maxDebtCombined).toFixed(2)}
+                Collatoralize: ${(this.state.percentage/100 * this.state.maxDebtCombined).toFixed(2)}
                 <input
                 type="range"
                 min="0"
