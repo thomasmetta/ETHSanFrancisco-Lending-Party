@@ -20,6 +20,7 @@ import bigTree from './bigTree.json';
 import Maker from '@makerdao/dai';
 import { calcMaxDebtInCDP, calcMaxDebtFromWallet, drawDaiAsync} from '../actions';
 import io from 'socket.io-client';
+import scrollToComponent from 'react-scroll-to-component';
 
 const socket = io("https://99aba3de.ngrok.io");
 
@@ -41,13 +42,23 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0};
+    this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false};
     this.handleClick = this.handleClick.bind(this);
+    this.scrollClick = this.scrollClick.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.myRef = React.createRef();
   }
 
   onChange(event) {
      this.setState({inputAmount: event.target.value});
+  }
+
+  scrollClick() {
+    scrollToComponent(this.resultPage, {
+      offset: 1000,
+      align: 'top',
+      duration: 1500
+    });
   }
 
   async handleClick(amount) {
@@ -78,7 +89,7 @@ class App extends Component {
   async componentDidMount() {
     socket.on('foo', data => {
       console.log("bar", data);
-      this.setState({showBarcode: false});
+      this.setState({isVerified: true});
     })
     const maker = Maker.create("kovan", {
       privateKey: process.env['REACT_APP_PRIVATE_KEY'],
@@ -102,6 +113,15 @@ class App extends Component {
     });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    console.log(prevState)
+    console.log(this.state)
+    if(prevState.isVerified !== this.state.isVerified){
+      console.log('scrollClick');
+      this.scrollClick();
+    }
+  }
+
   render() {
 
     console.log(this.state)
@@ -116,7 +136,7 @@ class App extends Component {
           <div className="app-head-container">
             <div>
             <h1 className="App-subtitle">Personal loans. Sign up with just your Bloom ID</h1>
-            {this.state.showBarcode && <BloomQRComponent/>}
+            {<BloomQRComponent/>}
             </div>
             <Lottie
               options={{
@@ -126,7 +146,7 @@ class App extends Component {
             />
           </div>
           <br/>
-          <div>
+          <div ref={(section) => { this.resultPage = section; }}>
           <Divider/>
           <div className="lendContainer firstContainer">
             <div className="lendTextContainer">
