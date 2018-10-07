@@ -27,7 +27,7 @@ import io from 'socket.io-client';
 import scrollToComponent from 'react-scroll-to-component';
 import PieChart from 'react-minimal-pie-chart';
 
-const ENDPOINT = "http://10.7.13.228:8000";
+const ENDPOINT = "http://10.7.13.228:8000/";
 
 const socket = io(ENDPOINT);
 
@@ -142,7 +142,7 @@ class App extends Component {
     .then(data => {
       setTimeout(() => {
         window.open('https://www.testwyre.com/dashboard', "_blank")
-      }, 3000)
+      }, 2000)
     });
   }
 
