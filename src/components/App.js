@@ -18,6 +18,8 @@ import animation from './pinjump.json';
 import smallTree from './smallTree.json';
 import bigTree from './bigTree.json';
 import downArrow from './downArrow.json';
+import checkJson from './check.json';
+import loadingJson from './loading.json';
 import Maker from '@makerdao/dai';
 import FundFromWalletDialog from './FundFromWalletDialog';
 import { calcMaxDebtInCDP, calcMaxDebtFromWallet, drawDaiAsync} from '../actions';
@@ -46,7 +48,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false, showDialog: false,
-      neededEth: 0, usd: 0, percentage: 0};
+      neededEth: 0, usd: 0, percentage: 0, isLoading: false, isFirstTime: true};
     this.handleClick = this.handleClick.bind(this);
     this.scrollClick = this.scrollClick.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -76,6 +78,10 @@ class App extends Component {
   }
 
   async handleClick(amount) {
+    this.setState({
+      isFirstTime: false,
+      isLoading: true
+    });
     if (!amount || amount == '' || parseFloat(amount) <= 0) {
       return; // no input
     }
@@ -109,8 +115,8 @@ class App extends Component {
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
       maxDebtCombined: Math.round(maxDebtCombined*100)/100,
+      isLoading: false
     });
-
   }
 
   async componentDidMount() {
@@ -245,6 +251,9 @@ class App extends Component {
                 />
                 <div className="lendContainer">
                   <Button size="massive" color="teal" onClick={()=>this.handleClick(this.state.valueToSubmit)}>Go</Button>
+                  {this.state.isFirstTime && <div className="firstTimeContainer"></div>}
+                  {this.state.isLoading && <Lottie options={{ animationData: loadingJson }} width={'10%'} />}
+                  {!this.state.isFirstTime && !this.state.isLoading && <Lottie options={{ animationData: checkJson, loop: false }} width={'10%'} />}
                 </div>
             </div>
 
