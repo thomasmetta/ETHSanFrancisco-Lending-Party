@@ -19,6 +19,9 @@ import smallTree from './smallTree.json';
 import bigTree from './bigTree.json';
 import Maker from '@makerdao/dai';
 import { calcMaxDebtInCDP, calcMaxDebtFromWallet} from '../actions';
+import io from 'socket.io-client';
+
+const socket = io("localhost:8000");
 
 const BloomQRComponent: React.SFC = props => {
   const requestData = {
@@ -38,10 +41,14 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {maxDebt: 0, maxDebtFromWallet: 0};
+    this.state = {maxDebt: 0, maxDebtFromWallet: 0, showBarcode: true};
   }
 
   async componentDidMount() {
+    socket.on('foo', data => {
+      console.log("bar", data);
+      this.setState({showBarcode: false});
+    })
     const maker = Maker.create("kovan", {
       privateKey: "C87509A1C067BBDE78BEB793E6FA76530B6382A4C0241E5E4A9EC0A0F44DC0D3",
       overrideMetamask: true
@@ -74,7 +81,7 @@ class App extends Component {
           <div className="app-head-container">
             <div>
             <h1 className="App-subtitle">Personal loans. Sign up only with your Bloom ID</h1>
-            <BloomQRComponent/>
+            {this.state.showBarcode && <BloomQRComponent/>}
             </div>
             <Lottie
               options={{
