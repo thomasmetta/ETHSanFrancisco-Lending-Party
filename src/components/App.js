@@ -77,7 +77,7 @@ class App extends Component {
 
   async handleClick(amount) {
     console.log(amount)
-    if (!amount || amount == '' || parseFloat(amount <= 0)) {
+    if (!amount || amount == '' || parseFloat(amount) <= 0) {
       return; // no input
     }
     amount = parseFloat(amount);
