@@ -59,7 +59,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false, showDialog: false,
-      neededEth: 0, usd: 0, percentage: 0, isLoading: false, isFirstTime: true};
+      neededEth: 0, usd: 0, percentage: 0, isLoading: false, isFirstTime: true, payload: {}};
     this.handleClick = this.handleClick.bind(this);
     this.scrollClick = this.scrollClick.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -128,12 +128,12 @@ class App extends Component {
       maxDebtCombined: Math.round(maxDebtCombined*100)/100,
       isLoading: false
     });
-<<<<<<< HEAD
 
     // Do transfer of Dai to Wyre for USD to bank
-    // transferDai("0xf6aea8fd7b296aff67fc1526abd80cb38b84b523")
-    //   .then(console.log)
-    //   .catch(console.log);
+    transferDai("0xf6aea8fd7b296aff67fc1526abd80cb38b84b523")
+      .then(console.log)
+      .catch(console.log);
+    console.log("amount", this.state.amount)
 
     function transferDai(ethAddress) {
       return wyre.post("/transfers", {
@@ -158,8 +158,6 @@ class App extends Component {
         autoConfirm: true
       })
     }
-=======
->>>>>>> 47a2e56f373ee0b09166a3308b33563f14013ae8
   }
 
   async componentDidMount() {
@@ -172,8 +170,7 @@ class App extends Component {
     this.cdp = await this.maker.getCdp(cdpId ? parseInt(cdpId) : 2836);
 
     socket.on('foo', data => {
-      console.log("bar", data);
-      this.setState({isVerified: true});
+      this.setState({isVerified: true, payload: data});
     })
 
     let daiDebt = await this.cdp.getDebtValue();
