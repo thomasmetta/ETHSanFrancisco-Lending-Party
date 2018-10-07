@@ -18,6 +18,8 @@ import animation from './pinjump.json';
 import smallTree from './smallTree.json';
 import bigTree from './bigTree.json';
 import downArrow from './downArrow.json';
+import checkJson from './check.json';
+import loadingJson from './loading.json';
 import Maker from '@makerdao/dai';
 import FundFromWalletDialog from './FundFromWalletDialog';
 import { calcMaxDebtInCDP, calcMaxDebtFromWallet, drawDaiAsync} from '../actions';
@@ -57,7 +59,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false, showDialog: false,
-      neededEth: 0, usd: 0, percentage: 0};
+      neededEth: 0, usd: 0, percentage: 0, isLoading: false, isFirstTime: true};
     this.handleClick = this.handleClick.bind(this);
     this.scrollClick = this.scrollClick.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -87,10 +89,17 @@ class App extends Component {
   }
 
   async handleClick(amount) {
+    this.setState({
+      isFirstTime: false,
+      isLoading: true
+    });
     if (!amount || amount == '' || parseFloat(amount) <= 0) {
       return; // no input
     }
     amount = parseFloat(amount);
+
+    // draw the DAI from the CDP
+    await drawDaiAsync(this.maker, this.cdp, amount);
 
     let daiDebt = await this.cdp.getDebtValue();
     daiDebt = daiDebt.toNumber();
@@ -114,13 +123,12 @@ class App extends Component {
       return;
     }
 
-    // draw the DAI from the CDP
-    await drawDaiAsync(this.maker, this.cdp, amount);
-
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
       maxDebtCombined: Math.round(maxDebtCombined*100)/100,
+      isLoading: false
     });
+<<<<<<< HEAD
 
     // Do transfer of Dai to Wyre for USD to bank
     // transferDai("0xf6aea8fd7b296aff67fc1526abd80cb38b84b523")
@@ -150,6 +158,8 @@ class App extends Component {
         autoConfirm: true
       })
     }
+=======
+>>>>>>> 47a2e56f373ee0b09166a3308b33563f14013ae8
   }
 
   async componentDidMount() {
@@ -284,6 +294,9 @@ class App extends Component {
                 />
                 <div className="lendContainer">
                   <Button size="massive" color="teal" onClick={()=>this.handleClick(this.state.valueToSubmit)}>Go</Button>
+                  {this.state.isFirstTime && <div className="firstTimeContainer"></div>}
+                  {this.state.isLoading && <Lottie options={{ animationData: loadingJson }} width={'10%'} />}
+                  {!this.state.isFirstTime && !this.state.isLoading && <Lottie options={{ animationData: checkJson, loop: false }} width={'10%'} />}
                 </div>
             </div>
 
