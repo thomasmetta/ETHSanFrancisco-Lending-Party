@@ -22,6 +22,7 @@ import Maker from '@makerdao/dai';
 import { calcMaxDebtInCDP, calcMaxDebtFromWallet, drawDaiAsync} from '../actions';
 import io from 'socket.io-client';
 import scrollToComponent from 'react-scroll-to-component';
+import PieChart from './PieChart';
 
 const socket = io("https://99aba3de.ngrok.io");
 
@@ -156,17 +157,17 @@ class App extends Component {
           </a>
           <Lottie options={{ animationData: animation }} width={'100%'} />
           <div id="app-head-container">
-            <div>
-            <h1 className="App-subtitle">Personal loans. Sign up with just your Bloom ID</h1>
-            <div id="qr-container">
-              {<BloomQRComponent/>}
-            </div>
+            <div id="turquoise" className="ui raised very padded text container segment">
+              <h1 className="App-subtitle">Personal loans. Sign up with just your Bloom ID</h1>
+              <div id="qr-container">
+                {<BloomQRComponent/>}
+              </div>
             </div>
           </div>
           <br/>
-          <div id="testing" ref={(section) => { this.resultPage = section; }}>
-            <Divider/>
+          <div id="testing" className="ui raised very padded text container segment" ref={(section) => { this.resultPage = section; }}>
             <h1 class="ui header lendContainer">Your Collatoralized Debt Positions</h1>
+            <Divider/>
             <Lottie options={{ animationData: smallTree }} width={450} />
             <div className="lendContainer firstContainer">
               <div class="ui card">
@@ -191,8 +192,10 @@ class App extends Component {
               Amount in USD to loan: <Input focus placeholder=''onChange={this.onChange} />
               <Button onClick={()=>this.handleClick(this.state.inputAmount)}>Go</Button>
             </div>
+            <PieChart passed={this.state.maxDebt}/>
             <Divider/>
           </div>
+
       </div>
     );
   }

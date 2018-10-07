@@ -32,12 +32,16 @@
   color: white;
 }
 
+#turquoise {
+  background-color: turquoise;
+}
+
 #app-head-container {
   display: flex;
   height: 86vh;
   justify-content: center;
   align-items: center;
-  background-color:turquoise;
+  background-color:#66e6d9;
   min-height: 100%;
 }
 
