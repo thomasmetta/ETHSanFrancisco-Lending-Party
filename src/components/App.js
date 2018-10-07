@@ -47,10 +47,6 @@ class App extends Component {
   }
 
   onChange(event) {
-    console.log(event.target.value)
-    // this.setState((state) => {
-    //   return {inputAmount: event.target.value};
-    // });
      this.setState({inputAmount: event.target.value});
   }
 

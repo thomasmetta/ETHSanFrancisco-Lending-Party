@@ -27,10 +27,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 40px;
 }
 
 .app-head-container {
   display: flex;
+  height: 86vh;
+  justify-content: center;
+  align-items: center;
 }
 
 .lendText {
