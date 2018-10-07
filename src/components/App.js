@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Button, Container, Divider, Grid, Header, Image, Menu, Segment } from 'semantic-ui-react'
+import { Button, Container, Divider, Grid, Header, Image, Menu, Segment, Message, Input } from 'semantic-ui-react';
+import { connect } from 'react-redux';
 
 import logo from '../logo.svg';
 import './App.css';
@@ -13,7 +14,9 @@ import WipeDebt from './WipeDebt.js';
 import ShutCdp from './ShutCdp.js';
 import {RequestQRCode, RequestData} from '@bloomprotocol/share-kit';
 import Lottie from 'lottie-react-web'
-import animation from './pinjump.json'
+import animation from './pinjump.json';
+import smallTree from './smallTree.json';
+import bigTree from './bigTree.json';
 
 const BloomQRComponent: React.SFC = props => {
   const requestData = {
@@ -33,7 +36,7 @@ class App extends Component {
 
   render() {
 
-
+    console.log(this.props.store)
 
     return (
 
@@ -67,9 +70,41 @@ class App extends Component {
           <DrawDai/>
           <WipeDebt/>
           <ShutCdp/>
+          <div>
+          <Divider/>
+          <div className="lendContainer firstContainer">
+            <div className="lendTextContainer">
+              You can lend out up to <div className="lendText">$100</div> from your CDP
+            </div>
+            <Lottie
+              options={{
+                animationData: smallTree
+              }}
+              width={450}
+            />
+          </div>
+          <div className="lendContainer">
+            <div className="lendTextContainer">
+              <div className="secondText">If you add collateral from your ETH Balance, you can lend out up to a total of <div className="lendText">$200</div></div>
+            </div>
+            <Lottie
+              options={{
+                animationData: bigTree
+              }}
+              width={450}
+            />
+          </div>
+          Amount: <Input focus placeholder='Search...' />
+          <Button>Go</Button>
+          <Divider/>
+          </div>
       </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return { store: state };
+};
+
+export default connect(mapStateToProps)(App);

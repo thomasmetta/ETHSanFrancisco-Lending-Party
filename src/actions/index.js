@@ -105,8 +105,8 @@ const shutCdpAsync = cdp => async dispatch => {
 
 export const startAsync = () => async dispatch => {
   dispatch(started());
-  const maker = Maker.create(process.env.REACT_APP_NETWORK, {
-    privateKey: process.env.REACT_APP_PRIVATE_KEY,
+  const maker = Maker.create("kovan", {
+    privateKey: "C87509A1C067BBDE78BEB793E6FA76530B6382A4C0241E5E4A9EC0A0F44DC0D3",
     overrideMetamask: true
   });
   console.log('maker:', maker);

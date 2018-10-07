@@ -33,6 +33,31 @@
   display: flex;
 }
 
+.lendText {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 2em;
+  color: #6067f1;
+}
+
+.lendTextContainer {
+  width: 450px;
+}
+
+.lendContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.secondText {
+  width: 522px;
+}
+
+.firstContainer {
+  margin-left: 57px;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
