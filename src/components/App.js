@@ -17,6 +17,7 @@ import Lottie from 'lottie-react-web'
 import animation from './pinjump.json';
 import smallTree from './smallTree.json';
 import bigTree from './bigTree.json';
+import downArrow from './downArrow.json';
 import Maker from '@makerdao/dai';
 import { calcMaxDebtInCDP, calcMaxDebtFromWallet, drawDaiAsync} from '../actions';
 import io from 'socket.io-client';
@@ -118,8 +119,25 @@ class App extends Component {
     console.log(this.state)
     if(prevState.isVerified !== this.state.isVerified){
       console.log('scrollClick');
-      this.scrollClick();
+      this.smoothScroll2();
+      // this.scrollClick();
     }
+  }
+
+  smoothScroll = () => {
+    document.querySelector('#app-head-container').scrollIntoView({
+      block: "start",
+      inline: "nearest",
+      behavior: 'smooth'
+    });
+  }
+
+  smoothScroll2 = () => {
+    document.querySelector('#testing').scrollIntoView({
+      block: "end",
+      inline: "nearest",
+      behavior: 'smooth'
+    });
   }
 
   render() {
@@ -130,49 +148,50 @@ class App extends Component {
 
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">BloomLending</h1>
+          < h1 className = "App-title" > 🎉LendingParty🎉 </h1>
         </header>
           <br/>
-          <div className="app-head-container">
+          <a onClick={this.smoothScroll} className="arrow-down">
+            <Lottie options={{ animationData: downArrow }} width={50} />
+          </a>
+          <Lottie options={{ animationData: animation }} width={'100%'} />
+          <div id="app-head-container">
             <div>
             <h1 className="App-subtitle">Personal loans. Sign up with just your Bloom ID</h1>
-            {<BloomQRComponent/>}
+            <div id="qr-container">
+              {<BloomQRComponent/>}
             </div>
-            <Lottie
-              options={{
-                animationData: animation
-              }}
-              width={650}
-            />
+            </div>
           </div>
           <br/>
-          <div ref={(section) => { this.resultPage = section; }}>
-          <Divider/>
-          <div className="lendContainer firstContainer">
-            <div className="lendTextContainer">
-              You can lend out up to <div className="lendText">${this.state.maxDebt}</div> from your CDP
+          <div id="testing" ref={(section) => { this.resultPage = section; }}>
+            <Divider/>
+            <h1 class="ui header lendContainer">Your Collatoralized Debt Positions</h1>
+            <Lottie options={{ animationData: smallTree }} width={450} />
+            <div className="lendContainer firstContainer">
+              <div class="ui card">
+                <div class="content">
+                  <div class="meta">TOTAL AMOUNT IN CDP</div>
+                  <br />
+                  <div class="header">${this.state.maxDebt}</div>
+                </div>
+              </div>
             </div>
-            <Lottie
-              options={{
-                animationData: smallTree
-              }}
-              width={450}
-            />
-          </div>
-          <div className="lendContainer">
-            <div className="lendTextContainer">
-              <div className="secondText">If you add collateral from your ETH Balance, you can lend out up to a total of <div className="lendText">${this.state.maxDebtCombined}</div></div>
+            <Lottie options={{ animationData: bigTree }} width={450} />
+            <div className = "lendContainer firstContainer">
+              <div class="ui card">
+                <div class="content">
+                  <div class="meta">TOTAL AMOUNT LOANABLE </div>
+                  <br />
+                  <div class="header">${this.state.maxDebtCombined}</div>
+                </div>
+              </div>
             </div>
-            <Lottie
-              options={{
-                animationData: bigTree
-              }}
-              width={450}
-            />
-          </div>
-          Amount in USD to loan: <Input focus placeholder=''onChange={this.onChange} />
-          <Button onClick={()=>this.handleClick(this.state.inputAmount)}>Go</Button>
-          <Divider/>
+            <div className = "lendContainer firstContainer">
+              Amount in USD to loan: <Input focus placeholder=''onChange={this.onChange} />
+              <Button onClick={()=>this.handleClick(this.state.inputAmount)}>Go</Button>
+            </div>
+            <Divider/>
           </div>
       </div>
     );
