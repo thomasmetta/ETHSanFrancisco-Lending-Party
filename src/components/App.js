@@ -50,20 +50,22 @@ class App extends Component {
       this.setState({showBarcode: false});
     })
     const maker = Maker.create("kovan", {
-      privateKey: "C87509A1C067BBDE78BEB793E6FA76530B6382A4C0241E5E4A9EC0A0F44DC0D3",
+      privateKey: process.env['REACT_APP_PRIVATE_KEY'],
+      //privateKey: "C87509A1C067BBDE78BEB793E6FA76530B6382A4C0241E5E4A9EC0A0F44DC0D3",
       overrideMetamask: true
     });
     await maker.authenticate();
-    const cdp = await maker.getCdp(2824);
+    let cdpId = process.env['REACT_APP_CDP_ID'];
+    const cdp = await maker.getCdp(cdpId ? parseInt(cdpId) : 2824);
 
     const maxDebt = await calcMaxDebtInCDP(maker, cdp);
     const maxDebtFromWallet = await calcMaxDebtFromWallet(maker, cdp);
     const maxDebtCombined = maxDebt + maxDebtFromWallet;
     this.setState((state) => {
-      return {maxDebt: maxDebt};
+      return {maxDebt: Math.round(maxDebt*100)/100};
     });
     this.setState((state) => {
-      return {maxDebtCombined: maxDebtCombined};
+      return {maxDebtCombined: Math.round(maxDebtCombined*100)/100};
     });
   }
 
