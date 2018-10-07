@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Container, Divider, Grid, Header, Image, Menu, Segment, Message, Input } from 'semantic-ui-react';
 import { connect } from 'react-redux';
-
+import axios from 'axios';
 import logo from '../logo.svg';
 import './App.css';
 import StartButton from './StartButton.js';
@@ -27,24 +27,15 @@ import io from 'socket.io-client';
 import scrollToComponent from 'react-scroll-to-component';
 import PieChart from 'react-minimal-pie-chart';
 
-const WyreClient = require('@wyre/api').WyreClient
-// import {WyreClient} from '@wyre/api'
-var session = process.env.WYRE_SUBSCRIPTION;
+const ENDPOINT = "http://10.7.13.228:8000/";
 
-let wyre = new WyreClient({
-  format: "json_numberstring",
-  apiKey: process.env.WYRE_API_KEY,
-  secretKey: process.env.WYRE_SECRET_KEY,
-  baseUrl: "https://api.testwyre.com/"
-})
-
-const socket = io("https://daab90ce.ngrok.io");
+const socket = io(ENDPOINT);
 
 const BloomQRComponent: React.SFC = props => {
   const requestData = {
   action: "request_attestation_data",
   token: '0x8f31e48a585fd12ba58e70e03292cac712cbae39bc7eb980ec189aa88e24d041',
-  url: 'https://daab90ce.ngrok.io',
+  url: ENDPOINT,
   org_logo_url: 'https://bloom.co/images/notif/bloom-logo.png',
   org_name: 'Bloom',
   org_usage_policy_url: 'https://bloom.co/legal/terms',
@@ -129,35 +120,10 @@ class App extends Component {
       isLoading: false
     });
 
-    // Do transfer of Dai to Wyre for USD to bank
-    transferDai("0xf6aea8fd7b296aff67fc1526abd80cb38b84b523")
-      .then(console.log)
-      .catch(console.log);
-    console.log("amount", this.state.amount)
-
-    function transferDai(ethAddress) {
-      return wyre.post("/transfers", {
-        dest: {
-          paymentMethodType: "INTERNATIONAL_TRANSFER",
-          paymentType: "LOCAL_BANK_WIRE",
-          currency: "USD",
-          country: "US",
-          beneficiaryType: "INDIVIDUAL",
-          firstNameOnAccount: "Brandon",
-          lastNameOnAccount: "In",
-          beneficiaryPhoneNumber: "1234567890",
-          accountNumber: "111111111111111",
-          routingNumber: "111111111",
-          accountType: "CHECKING",
-          chargeablePM: true,
-          bankName: "Bank of America"
-        },
-        destCurrency: "USD",
-        sourceCurrency: "DAI",
-        destAmount: amount,
-        autoConfirm: true
-      })
-    }
+    axios.post(ENDPOINT+'wyre', {
+      amount
+    })
+    .then(data => console.log('dat data', data));
   }
 
   async componentDidMount() {
