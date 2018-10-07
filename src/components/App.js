@@ -81,6 +81,9 @@ class App extends Component {
     }
     amount = parseFloat(amount);
 
+    // draw the DAI from the CDP
+    await drawDaiAsync(this.maker, this.cdp, amount);
+
     let daiDebt = await this.cdp.getDebtValue();
     daiDebt = daiDebt.toNumber();
     const maxDebt = await calcMaxDebtInCDP(this.maker, this.cdp);
@@ -102,9 +105,6 @@ class App extends Component {
       });
       return;
     }
-
-    // draw the DAI from the CDP
-    await drawDaiAsync(this.maker, this.cdp, amount);
 
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
