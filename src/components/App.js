@@ -69,6 +69,9 @@ class App extends Component {
     // transfer eth to the CDP
     console.log("going to draw an additional " + this.state.neededEth + " ether from wallet");
     const lockEthTx = await this.cdp.lockEth(this.state.neededEth);
+    this.setState({
+      neededEth: 0
+    });
     // now we can update again
     this.handleClick(this.inputAmount);
   }
