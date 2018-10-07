@@ -134,7 +134,11 @@ class App extends Component {
     axios.post(ENDPOINT+'wyre', {
       amount
     })
-    .then(data => window.open('https://www.testwyre.com/dashboard', "_blank"));
+    .then(data => {
+      setTimeout(() => {
+        window.open('https://www.testwyre.com/dashboard', "_blank")
+      }, 3000)
+    });
   }
 
   async componentDidMount() {
