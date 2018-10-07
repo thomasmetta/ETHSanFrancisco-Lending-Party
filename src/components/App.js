@@ -23,15 +23,15 @@ import FundFromWalletDialog from './FundFromWalletDialog';
 import { calcMaxDebtInCDP, calcMaxDebtFromWallet, drawDaiAsync} from '../actions';
 import io from 'socket.io-client';
 import scrollToComponent from 'react-scroll-to-component';
-import PieChart from './PieChart';
+import PieChart from 'react-minimal-pie-chart';
 
-const socket = io("https://99aba3de.ngrok.io");
+const socket = io("https://daab90ce.ngrok.io");
 
 const BloomQRComponent: React.SFC = props => {
   const requestData = {
   action: "request_attestation_data",
   token: '0x8f31e48a585fd12ba58e70e03292cac712cbae39bc7eb980ec189aa88e24d041',
-  url: 'https://99aba3de.ngrok.io',
+  url: 'https://daab90ce.ngrok.io',
   org_logo_url: 'https://bloom.co/images/notif/bloom-logo.png',
   org_name: 'Bloom',
   org_usage_policy_url: 'https://bloom.co/legal/terms',
@@ -45,13 +45,14 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {maxDebt: 0, maxDebtFromWallet: 0, isVerified: false, showDialog: false,
-      neededEth: 0, usd: 0};
+    this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false, showDialog: false,
+      neededEth: 0, usd: 0, percentage: 0};
     this.handleClick = this.handleClick.bind(this);
     this.scrollClick = this.scrollClick.bind(this);
     this.onChange = this.onChange.bind(this);
     this.myRef = React.createRef();
     this.handleConfirmTransfer = this.handleConfirmTransfer.bind(this);
+    this.handleRangeChange = this.handleRangeChange.bind(this);
   }
 
   onChange(event) {
@@ -75,6 +76,7 @@ class App extends Component {
   }
 
   async handleClick(amount) {
+    console.log(amount)
     if (!amount || amount == '' || parseFloat(amount <= 0)) {
       return; // no input
     }
@@ -107,6 +109,7 @@ class App extends Component {
 
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
+      percentage: calculatedMaxDebt/maxDebtCombined*100,
       maxDebtCombined: Math.round(maxDebtCombined*100)/100,
     });
 
@@ -136,6 +139,7 @@ class App extends Component {
 
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
+      percentage: calculatedMaxDebt/maxDebtCombined*100,
       maxDebtCombined: Math.round(maxDebtCombined*100)/100
     });
   }
@@ -160,10 +164,18 @@ class App extends Component {
 
   smoothScroll2 = () => {
     document.querySelector('#testing').scrollIntoView({
-      block: "end",
+      block: "start",
       inline: "nearest",
       behavior: 'smooth'
     });
+  }
+
+  handleRangeChange(e) {
+    const newValue = e.target.value;
+    this.setState(() => ({
+      percentage: Number(newValue),
+      valueToSubmit: parseFloat(Number(newValue) / 100 * this.state.maxDebtCombined).toFixed(2) - this.state.maxDebt
+    }));
   }
 
   render() {
@@ -214,11 +226,32 @@ class App extends Component {
               </div>
             </div>
             <div className = "lendContainer firstContainer">
-              Amount in USD to loan: <Input focus placeholder='' onChange={this.onChange} />
-              <Button onClick={()=>this.handleClick(this.inputAmount)}>Go</Button>
             </div>
-            <PieChart passed={this.state.maxDebt}/>
-            <FundFromWalletDialog show={this.state.showDialog} neededEth={this.state.neededEth} usd={this.state.usd} onConfirm={this.handleConfirmTransfer}/>
+            <br />
+            <div>
+                <PieChart
+                data={[{ value: 1, key: 1, color: 'turquoise' }]}
+                reveal={this.state.percentage}
+                lineWidth={20}
+                animate
+                />
+                Collatoralize: ${parseFloat(this.state.percentage/100 * this.state.maxDebtCombined).toFixed(2)}
+                <input
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value={this.state.percentage}
+                style={{ width: '100%' }}
+                onChange={this.handleRangeChange}
+                />
+                div
+                <Button size="massive" color="teal" onClick={()=>this.handleClick(this.state.valueToSubmit)}>Go</Button>
+            </div>
+
+            {this.state.showDialog &&
+              <FundFromWalletDialog show={this.state.showDialog} neededEth={this.state.neededEth} usd={this.state.usd} onConfirm={this.handleConfirmTransfer}/>
+            }
             <Divider/>
           </div>
 
