@@ -45,7 +45,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false, showDialog: false,
+    this.state = {maxDebt: 0, maxDebtFromWallet: 0, isVerified: false, showDialog: false,
       neededEth: 0, usd: 0};
     this.handleClick = this.handleClick.bind(this);
     this.scrollClick = this.scrollClick.bind(this);
@@ -55,11 +55,15 @@ class App extends Component {
   }
 
   onChange(event) {
-     this.setState({inputAmount: event.target.value});
+    this.inputAmount = event.target.value;
   }
 
-  handleConfirmTransfer(val) {
-      console.log("confirmed!");
+  async handleConfirmTransfer(val) {
+    console.log("confirmed!");
+    // transfer eth to the CDP
+    const lockEthTx = await this.cdp.lockEth(this.state.neededEth);
+    // now we can update again
+    this.handleClick(this.inputAmount);
   }
 
   scrollClick() {
@@ -76,34 +80,30 @@ class App extends Component {
     }
     amount = parseFloat(amount);
 
-    const maker = Maker.create("kovan", {
-      privateKey: process.env['REACT_APP_PRIVATE_KEY'],
-      overrideMetamask: true
-    });
-    await maker.authenticate();
-    let cdpId = process.env['REACT_APP_CDP_ID'];
-    const cdp = await maker.getCdp(cdpId ? parseInt(cdpId) : 2836);
-
-    //await drawDaiAsync(maker,cdp, amount);
-
-    const daiDebt = await cdp.getDebtValue();
-    const daiDebtString = daiDebt._amount.toString();
-    const maxDebt = await calcMaxDebtInCDP(maker, cdp);
-    const calculatedMaxDebt = maxDebt-daiDebtString;
-    const maxDebtFromWallet = await calcMaxDebtFromWallet(maker, cdp);
+    let daiDebt = await this.cdp.getDebtValue();
+    daiDebt = daiDebt.toNumber();
+    const maxDebt = await calcMaxDebtInCDP(this.maker, this.cdp);
+    let calculatedMaxDebt = maxDebt-daiDebt;
+    calculatedMaxDebt = Math.max(calculatedMaxDebt, 0);
+    const maxDebtFromWallet = await calcMaxDebtFromWallet(this.maker, this.cdp);
     const maxDebtCombined = calculatedMaxDebt + maxDebtFromWallet;
 
     // if the requested amount is greater than what's available in the CDP
     // bring up the confirmation dialog
     // otherwise, continue
+    console.log("amount is " + amount + " debt is " + calculatedMaxDebt);
     if (amount > maxDebt) {
       this.setState({
+        // TODO: need to calculate neededEth and usd here
         neededEth: 10,
         usd: 20,
         showDialog: true
       });
       return;
     }
+
+    // draw the DAI from the CDP
+    await drawDaiAsync(this.maker, this.cdp, amount);
 
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
@@ -113,24 +113,27 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    this.maker = Maker.create("kovan", {
+      privateKey: process.env['REACT_APP_PRIVATE_KEY'],
+      overrideMetamask: true
+    });
+    await this.maker.authenticate();
+    let cdpId = process.env['REACT_APP_CDP_ID'];
+    this.cdp = await this.maker.getCdp(cdpId ? parseInt(cdpId) : 2836);
+
     socket.on('foo', data => {
       console.log("bar", data);
       this.setState({isVerified: true});
     })
-    const maker = Maker.create("kovan", {
-      privateKey: process.env['REACT_APP_PRIVATE_KEY'],
-      overrideMetamask: true
-    });
-    await maker.authenticate();
-    let cdpId = process.env['REACT_APP_CDP_ID'];
-    const cdp = await maker.getCdp(cdpId ? parseInt(cdpId) : 2836);
 
-    const daiDebt = await cdp.getDebtValue();
-    const daiDebtString = daiDebt._amount.toString();
-    const maxDebt = await calcMaxDebtInCDP(maker, cdp);
-    const calculatedMaxDebt = maxDebt-daiDebtString;
-    const maxDebtFromWallet = await calcMaxDebtFromWallet(maker, cdp);
+    let daiDebt = await this.cdp.getDebtValue();
+    daiDebt = daiDebt.toNumber();
+    const maxDebt = await calcMaxDebtInCDP(this.maker, this.cdp);
+    let calculatedMaxDebt = maxDebt-daiDebt;
+    calculatedMaxDebt = Math.max(calculatedMaxDebt, 0);
+    const maxDebtFromWallet = await calcMaxDebtFromWallet(this.maker, this.cdp);
     const maxDebtCombined = calculatedMaxDebt + maxDebtFromWallet;
+
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
       maxDebtCombined: Math.round(maxDebtCombined*100)/100
@@ -188,7 +191,7 @@ class App extends Component {
           </div>
           <br/>
           <div id="testing" className="ui raised very padded text container segment" ref={(section) => { this.resultPage = section; }}>
-            <h1 class="ui header lendContainer">Your Collatoralized Debt Positions</h1>
+            <h1 className="ui header lendContainer">Your Collatoralized Debt Positions</h1>
             <Divider/>
             <Lottie options={{ animationData: smallTree }} width={450} />
             <div className="lendContainer firstContainer">
@@ -211,13 +214,11 @@ class App extends Component {
               </div>
             </div>
             <div className = "lendContainer firstContainer">
-              Amount in USD to loan: <Input focus placeholder=''onChange={this.onChange} />
-              <Button onClick={()=>this.handleClick(this.state.inputAmount)}>Go</Button>
+              Amount in USD to loan: <Input focus placeholder='' onChange={this.onChange} />
+              <Button onClick={()=>this.handleClick(this.inputAmount)}>Go</Button>
             </div>
             <PieChart passed={this.state.maxDebt}/>
-            {this.state.showDialog &&
-              <FundFromWalletDialog neededEth={this.state.neededEth} usd={this.state.usd} onConfirm={this.handleConfirmTransfer}/>
-            }
+            <FundFromWalletDialog show={this.state.showDialog} neededEth={this.state.neededEth} usd={this.state.usd} onConfirm={this.handleConfirmTransfer}/>
             <Divider/>
           </div>
 
