@@ -1,22 +1,42 @@
-import React from 'react'
-import { Button, Modal } from 'semantic-ui-react'
+import React, { Component } from 'react';
+import { Button, Modal } from 'semantic-ui-react';
 
 class FundFromWalletDialog extends Component {
+
   constructor(props) {
     super(props);
-    this.state = {neededEth: 0, usd: 0};
+    this.state = {
+      open: true
+    }
+  }
+
+  close = () => this.setState({ open: false })
+
+  confirm = () => {
+    console.log("confirmed");
+
+    this.setState({ open: false })
   }
 
   render() {
     return (
-      <Modal
-        trigger={<Button>Show Modal</Button>}
-        header='Transfer funds from Metamask!'
-        content="You should transfer ${this.state.neededEth} ETH from your wallet in order to take out a ${this.state.usd} \
- loan (and maintain a safe collatoralization ratio)."
-        actions={['Cancel', { key: 'done', content: 'Confirm', positive: true }]}
-      />
+      <Modal open={this.state.open}>
+        <Modal.Header>Transfer funds from Metamask?</Modal.Header>
+        <Modal.Content>
+         You should transfer {this.props.neededEth} ETH from your wallet in order to take out
+         a {this.props.usd} loan (and maintain a safe collatoralization ratio).
+        </Modal.Content>
+        <Modal.Actions>
+          <Button onClick={this.close} negative content='Cancel'/>
+          <Button
+            onClick={this.confirm}
+            positive
+            content='Confirm'
+          />
+        </Modal.Actions>
+      </Modal>
     );
   }
+}
 
-export default FundFromWalletDialog
+export default FundFromWalletDialog;

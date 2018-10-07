@@ -18,6 +18,7 @@ import animation from './pinjump.json';
 import smallTree from './smallTree.json';
 import bigTree from './bigTree.json';
 import Maker from '@makerdao/dai';
+import FundFromWalletDialog from './FundFromWalletDialog';
 import { calcMaxDebtInCDP, calcMaxDebtFromWallet, drawDaiAsync} from '../actions';
 import io from 'socket.io-client';
 import scrollToComponent from 'react-scroll-to-component';
@@ -42,7 +43,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false};
+    this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false, showDialog: false};
     this.handleClick = this.handleClick.bind(this);
     this.scrollClick = this.scrollClick.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -62,6 +63,12 @@ class App extends Component {
   }
 
   async handleClick(amount) {
+    if (!amount || amount == '' || parseFloat(amount <= 0)) {
+      return; // no input
+    }
+    this.setState({
+      showDialog: true
+    });
     const maker = Maker.create("kovan", {
       privateKey: process.env['REACT_APP_PRIVATE_KEY'],
       overrideMetamask: true
@@ -78,11 +85,9 @@ class App extends Component {
     const calculatedMaxDebt = maxDebt-daiDebtString;
     const maxDebtFromWallet = await calcMaxDebtFromWallet(maker, cdp);
     const maxDebtCombined = calculatedMaxDebt + maxDebtFromWallet;
-    this.setState((state) => {
-      return {maxDebt: Math.round(calculatedMaxDebt*100)/100};
-    });
-    this.setState((state) => {
-      return {maxDebtCombined: Math.round(maxDebtCombined*100)/100};
+    this.setState({
+      maxDebt: Math.round(calculatedMaxDebt*100)/100,
+      maxDebtCombined: Math.round(maxDebtCombined*100)/100,
     });
   }
 
@@ -105,11 +110,9 @@ class App extends Component {
     const calculatedMaxDebt = maxDebt-daiDebtString;
     const maxDebtFromWallet = await calcMaxDebtFromWallet(maker, cdp);
     const maxDebtCombined = calculatedMaxDebt + maxDebtFromWallet;
-    this.setState((state) => {
-      return {maxDebt: Math.round(calculatedMaxDebt*100)/100};
-    });
-    this.setState((state) => {
-      return {maxDebtCombined: Math.round(maxDebtCombined*100)/100};
+    this.setState({
+      maxDebt: Math.round(calculatedMaxDebt*100)/100,
+      maxDebtCombined: Math.round(maxDebtCombined*100)/100
     });
   }
 
@@ -124,7 +127,7 @@ class App extends Component {
 
   render() {
 
-    console.log(this.state)
+    //console.log(this.state)
 
     return (
 
@@ -172,6 +175,9 @@ class App extends Component {
           </div>
           Amount in USD to loan: <Input focus placeholder=''onChange={this.onChange} />
           <Button onClick={()=>this.handleClick(this.state.inputAmount)}>Go</Button>
+          {this.state.showDialog &&
+            <FundFromWalletDialog neededEth="10" usd="20"/>
+          }
           <Divider/>
           </div>
       </div>
