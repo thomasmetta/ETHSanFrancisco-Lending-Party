@@ -6,20 +6,28 @@ class FundFromWalletDialog extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      open: true
+      show: false
     }
   }
 
-  close = () => this.setState({ open: false })
+  close = () => { this.setState({show:false}) }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.show !== this.state.show) {
+      this.setState({ show: nextProps.show });
+    }
+  }
 
   confirm = () => {
-    this.props.onConfirmTransfer(true);
-    this.setState({ open: false })
+    this.props.onConfirm(true);
+    this.setState({
+      show: false
+    })
   }
 
   render() {
     return (
-      <Modal open={this.state.open}>
+      <Modal open={this.state.show}>
         <Modal.Header>Transfer funds from Metamask?</Modal.Header>
         <Modal.Content>
          You should transfer {this.props.neededEth} ETH from your wallet in order to take out
