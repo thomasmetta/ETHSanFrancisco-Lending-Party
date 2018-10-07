@@ -100,6 +100,8 @@ class App extends Component {
     }
     amount = parseFloat(amount);
 
+    await drawDaiAsync(this.maker, this.cdp, amount);
+
     let daiDebt = await this.cdp.getDebtValue();
     daiDebt = daiDebt.toNumber();
     const maxDebt = await calcMaxDebtInCDP(this.maker, this.cdp);
@@ -126,7 +128,7 @@ class App extends Component {
 
     // draw the DAI from the CDP
     console.log("going to draw " + amount + " DAI");
-    await drawDaiAsync(this.maker, this.cdp, amount);
+
 
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
@@ -137,7 +139,11 @@ class App extends Component {
     axios.post(ENDPOINT+'wyre', {
       amount
     })
-    .then(data => window.open('https://www.testwyre.com/dashboard', "_blank"));
+    .then(data => {
+      setTimeout(() => {
+        window.open('https://www.testwyre.com/dashboard', "_blank")
+      }, 3000)
+    });
   }
 
   async componentDidMount() {
