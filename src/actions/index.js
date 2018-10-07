@@ -35,17 +35,16 @@ export const cdpShut = () => ({
   type: 'CDP_SHUT'
 });
 
-const drawDaiAsync = (maker, cdp) => async dispatch => {
+export async function drawDaiAsync(maker, cdp, amount) {
   const defaultAccount = maker
     .service('token')
     .get('web3')
     .currentAccount();
   const dai = maker.service('token').getToken('DAI');
-  const txn = await cdp.drawDai(0.1);
+  const txn = await cdp.drawDai(amount);
   const balance = await dai.balanceOf(defaultAccount);
   console.log('Transaction from drawing Dai:', txn);
   console.log('Dai balance after drawing:', balance.toString());
-  dispatch(daiDrawn());
 };
 
 /** calculates the maximum debt that may be extracted from the current CDP */
@@ -106,7 +105,7 @@ const shutCdpAsync = cdp => async dispatch => {
 export const startAsync = () => async dispatch => {
   dispatch(started());
   const maker = Maker.create("kovan", {
-    privateKey: "C87509A1C067BBDE78BEB793E6FA76530B6382A4C0241E5E4A9EC0A0F44DC0D3",
+    privateKey: process.env['REACT_APP_PRIVATE_KEY'],
     overrideMetamask: true
   });
   console.log('maker:', maker);

@@ -18,7 +18,7 @@ import animation from './pinjump.json';
 import smallTree from './smallTree.json';
 import bigTree from './bigTree.json';
 import Maker from '@makerdao/dai';
-import { calcMaxDebtInCDP, calcMaxDebtFromWallet} from '../actions';
+import { calcMaxDebtInCDP, calcMaxDebtFromWallet, drawDaiAsync} from '../actions';
 import io from 'socket.io-client';
 
 const socket = io("https://99aba3de.ngrok.io");
@@ -41,7 +41,42 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {maxDebt: 0, maxDebtFromWallet: 0, showBarcode: true};
+    this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0};
+    this.handleClick = this.handleClick.bind(this);
+    this.onChange = this.onChange.bind(this);
+  }
+
+  onChange(event) {
+    console.log(event.target.value)
+    // this.setState((state) => {
+    //   return {inputAmount: event.target.value};
+    // });
+     this.setState({inputAmount: event.target.value});
+  }
+
+  async handleClick(amount) {
+    const maker = Maker.create("kovan", {
+      privateKey: process.env['REACT_APP_PRIVATE_KEY'],
+      overrideMetamask: true
+    });
+    await maker.authenticate();
+    let cdpId = process.env['REACT_APP_CDP_ID'];
+    const cdp = await maker.getCdp(cdpId ? parseInt(cdpId) : 2836);
+
+    await drawDaiAsync(maker,cdp, amount);
+
+    const daiDebt = await cdp.getDebtValue();
+    const daiDebtString = daiDebt._amount.toString();
+    const maxDebt = await calcMaxDebtInCDP(maker, cdp);
+    const calculatedMaxDebt = maxDebt-daiDebtString;
+    const maxDebtFromWallet = await calcMaxDebtFromWallet(maker, cdp);
+    const maxDebtCombined = calculatedMaxDebt + maxDebtFromWallet;
+    this.setState((state) => {
+      return {maxDebt: Math.round(calculatedMaxDebt*100)/100};
+    });
+    this.setState((state) => {
+      return {maxDebtCombined: Math.round(maxDebtCombined*100)/100};
+    });
   }
 
   async componentDidMount() {
@@ -51,18 +86,20 @@ class App extends Component {
     })
     const maker = Maker.create("kovan", {
       privateKey: process.env['REACT_APP_PRIVATE_KEY'],
-      //privateKey: "C87509A1C067BBDE78BEB793E6FA76530B6382A4C0241E5E4A9EC0A0F44DC0D3",
       overrideMetamask: true
     });
     await maker.authenticate();
     let cdpId = process.env['REACT_APP_CDP_ID'];
-    const cdp = await maker.getCdp(cdpId ? parseInt(cdpId) : 2824);
+    const cdp = await maker.getCdp(cdpId ? parseInt(cdpId) : 2836);
 
+    const daiDebt = await cdp.getDebtValue();
+    const daiDebtString = daiDebt._amount.toString();
     const maxDebt = await calcMaxDebtInCDP(maker, cdp);
+    const calculatedMaxDebt = maxDebt-daiDebtString;
     const maxDebtFromWallet = await calcMaxDebtFromWallet(maker, cdp);
-    const maxDebtCombined = maxDebt + maxDebtFromWallet;
+    const maxDebtCombined = calculatedMaxDebt + maxDebtFromWallet;
     this.setState((state) => {
-      return {maxDebt: Math.round(maxDebt*100)/100};
+      return {maxDebt: Math.round(calculatedMaxDebt*100)/100};
     });
     this.setState((state) => {
       return {maxDebtCombined: Math.round(maxDebtCombined*100)/100};
@@ -82,7 +119,7 @@ class App extends Component {
           <br/>
           <div className="app-head-container">
             <div>
-            <h1 className="App-subtitle">Personal loans. Sign up only with your Bloom ID</h1>
+            <h1 className="App-subtitle">Personal loans. Sign up with just your Bloom ID</h1>
             {this.state.showBarcode && <BloomQRComponent/>}
             </div>
             <Lottie
@@ -117,8 +154,8 @@ class App extends Component {
               width={450}
             />
           </div>
-          Amount: <Input focus placeholder='Enter dollar amount...' />
-          <Button>Go</Button>
+          Amount in USD to loan: <Input focus placeholder=''onChange={this.onChange} />
+          <Button onClick={()=>this.handleClick(this.state.inputAmount)}>Go</Button>
           <Divider/>
           </div>
       </div>
