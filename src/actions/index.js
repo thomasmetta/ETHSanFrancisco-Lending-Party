@@ -64,6 +64,14 @@ export async function calcMaxDebtInCDP(maker, cdp) {
   return maxDebt;
 }
 
+export async function calcNeededEth(maker, neededUsd) {
+  const price = maker.service('price');
+  const ethPrice = await price.getEthPrice();
+
+  let needed = (neededUsd / ethPrice.toNumber()) * MIN_RATIO/100;
+  return Math.round(needed * 100) / 100;
+}
+
 /** calculates the maximum debt that may be extracted from the Metamask wallet */
 export async function calcMaxDebtFromWallet(maker, cdp) {
   const dai = maker.service('token').getToken('ETH');

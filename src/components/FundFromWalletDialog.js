@@ -10,7 +10,10 @@ class FundFromWalletDialog extends Component {
     }
   }
 
-  close = () => { this.setState({show:false}) }
+  close = () => {
+    this.props.onClose(true);
+    this.setState({show:false})
+  }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.show !== this.state.show) {

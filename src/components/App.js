@@ -22,7 +22,7 @@ import checkJson from './check.json';
 import loadingJson from './loading.json';
 import Maker from '@makerdao/dai';
 import FundFromWalletDialog from './FundFromWalletDialog';
-import { calcMaxDebtInCDP, calcMaxDebtFromWallet, drawDaiAsync} from '../actions';
+import { calcMaxDebtInCDP, calcMaxDebtFromWallet, calcNeededEth, drawDaiAsync} from '../actions';
 import io from 'socket.io-client';
 import scrollToComponent from 'react-scroll-to-component';
 import PieChart from 'react-minimal-pie-chart';
@@ -52,6 +52,7 @@ class App extends Component {
     this.state = {maxDebt: 0, maxDebtFromWallet: 0, inputAmount: 0, isVerified: false, showDialog: false,
       neededEth: 0, usd: 0, percentage: 0, isLoading: false, isFirstTime: true, payload: {}};
     this.handleClick = this.handleClick.bind(this);
+    this.handleCloseDialog = this.handleCloseDialog.bind(this);
     this.scrollClick = this.scrollClick.bind(this);
     this.onChange = this.onChange.bind(this);
     this.myRef = React.createRef();
@@ -66,9 +67,16 @@ class App extends Component {
   async handleConfirmTransfer(val) {
     console.log("confirmed!");
     // transfer eth to the CDP
+    console.log("going to draw an additional " + this.state.neededEth + " ether from wallet");
     const lockEthTx = await this.cdp.lockEth(this.state.neededEth);
     // now we can update again
     this.handleClick(this.inputAmount);
+  }
+
+  async handleCloseDialog() {
+    this.setState({
+      showDialog: false
+    });
   }
 
   scrollClick() {
@@ -89,9 +97,6 @@ class App extends Component {
     }
     amount = parseFloat(amount);
 
-    // draw the DAI from the CDP
-    await drawDaiAsync(this.maker, this.cdp, amount);
-
     let daiDebt = await this.cdp.getDebtValue();
     daiDebt = daiDebt.toNumber();
     const maxDebt = await calcMaxDebtInCDP(this.maker, this.cdp);
@@ -104,15 +109,21 @@ class App extends Component {
     // bring up the confirmation dialog
     // otherwise, continue
     console.log("amount is " + amount + " debt is " + calculatedMaxDebt);
-    if (amount > maxDebt) {
+    if (amount > calculatedMaxDebt) {
+      let neededUsd = amount - calculatedMaxDebt;
+      // get eth value to calculate
+      let neededEth = await calcNeededEth(this.maker, neededUsd);
       this.setState({
-        // TODO: need to calculate neededEth and usd here
-        neededEth: 10,
-        usd: 20,
+        neededEth: neededEth,
+        usd: amount,
         showDialog: true
       });
       return;
     }
+
+    // draw the DAI from the CDP
+    console.log("going to draw " + amount + " DAI");
+    await drawDaiAsync(this.maker, this.cdp, amount);
 
     this.setState({
       maxDebt: Math.round(calculatedMaxDebt*100)/100,
@@ -253,7 +264,7 @@ class App extends Component {
                 step="1"
                 value={this.state.percentage}
                 style={{ width: '100%' }}
-                onChange={this.handleRangeChange}
+                onChange={(e) => this.handleRangeChange(e)}
                 />
                 <div className="lendContainer">
                   <Button size="massive" color="teal" onClick={()=>this.handleClick(this.state.valueToSubmit)}>Go</Button>
@@ -263,9 +274,7 @@ class App extends Component {
                 </div>
             </div>
 
-            {this.state.showDialog &&
-              <FundFromWalletDialog show={this.state.showDialog} neededEth={this.state.neededEth} usd={this.state.usd} onConfirm={this.handleConfirmTransfer}/>
-            }
+            <FundFromWalletDialog show={this.state.showDialog} neededEth={this.state.neededEth} usd={this.state.usd} onClose={this.handleCloseDialog} onConfirm={this.handleConfirmTransfer}/>
             <Divider/>
           </div>
 
