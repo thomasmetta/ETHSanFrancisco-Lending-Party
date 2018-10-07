@@ -17,6 +17,8 @@ import Lottie from 'lottie-react-web'
 import animation from './pinjump.json';
 import smallTree from './smallTree.json';
 import bigTree from './bigTree.json';
+import Maker from '@makerdao/dai';
+import { calcMaxDebtInCDP, calcMaxDebtFromWallet} from '../actions';
 
 const BloomQRComponent: React.SFC = props => {
   const requestData = {
@@ -34,9 +36,33 @@ const BloomQRComponent: React.SFC = props => {
 
 class App extends Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {maxDebt: 0, maxDebtFromWallet: 0};
+  }
+
+  async componentDidMount() {
+    const maker = Maker.create("kovan", {
+      privateKey: "C87509A1C067BBDE78BEB793E6FA76530B6382A4C0241E5E4A9EC0A0F44DC0D3",
+      overrideMetamask: true
+    });
+    await maker.authenticate();
+    const cdp = await maker.getCdp(2824);
+
+    const maxDebt = await calcMaxDebtInCDP(maker, cdp);
+    const maxDebtFromWallet = await calcMaxDebtFromWallet(maker, cdp);
+    const maxDebtCombined = maxDebt + maxDebtFromWallet;
+    this.setState((state) => {
+      return {maxDebt: maxDebt};
+    });
+    this.setState((state) => {
+      return {maxDebtCombined: maxDebtCombined};
+    });
+  }
+
   render() {
 
-    console.log(this.props.store)
+    console.log(this.state)
 
     return (
 
@@ -58,23 +84,11 @@ class App extends Component {
             />
           </div>
           <br/>
-          <br /><p className="App-intro"><strong>This application pulls in maker.js to open a cdp, lock eth, draw dai, repay the dai, and then shut the cdp.  Each transaction is sent after the other is mined.  Progress is reported below.  Click Start to begin.</strong></p><br />
-          <Container style={{ marginTop: '3em' }}>
-            <Header as='h1'>Maker CDPs</Header>
-            <StartButton/>
-          </Container>
-          <CreateMaker/>
-          <AuthenticateMaker/>
-          <OpenCdp/>
-          <LockEth/>
-          <DrawDai/>
-          <WipeDebt/>
-          <ShutCdp/>
           <div>
           <Divider/>
           <div className="lendContainer firstContainer">
             <div className="lendTextContainer">
-              You can lend out up to <div className="lendText">$100</div> from your CDP
+              You can lend out up to <div className="lendText">${this.state.maxDebt}</div> from your CDP
             </div>
             <Lottie
               options={{
@@ -85,7 +99,7 @@ class App extends Component {
           </div>
           <div className="lendContainer">
             <div className="lendTextContainer">
-              <div className="secondText">If you add collateral from your ETH Balance, you can lend out up to a total of <div className="lendText">$200</div></div>
+              <div className="secondText">If you add collateral from your ETH Balance, you can lend out up to a total of <div className="lendText">${this.state.maxDebtCombined}</div></div>
             </div>
             <Lottie
               options={{

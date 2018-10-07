@@ -49,7 +49,7 @@ const drawDaiAsync = (maker, cdp) => async dispatch => {
 };
 
 /** calculates the maximum debt that may be extracted from the current CDP */
-async function calcMaxDebtInCDP(maker, cdp) {
+export async function calcMaxDebtInCDP(maker, cdp) {
   const price = maker.service('price');
   const ethPrice = await price.getEthPrice();
   const pethCollateral = await cdp.getCollateralValue(Maker.PETH);
@@ -57,16 +57,16 @@ async function calcMaxDebtInCDP(maker, cdp) {
   const debtValue = await cdp.getDebtValue(Maker.DAI);
   let maxDebt = (ethPrice.toNumber() * pethCollateral.toNumber() * wethPethRatio * 100) / MIN_RATIO;
 
-  console.log("collateral PETH = " + pethCollateral);
-  console.log("WETH/PETH ratio = " + wethPethRatio);
-  console.log("debt value = " + debtValue);
-
-  console.log('max debt from CDP = ' + maxDebt + ' DAI');
+  // console.log("collateral PETH = " + pethCollateral);
+  // console.log("WETH/PETH ratio = " + wethPethRatio);
+  // console.log("debt value = " + debtValue);
+  //
+  // console.log('max debt from CDP = ' + maxDebt + ' DAI');
   return maxDebt;
 }
 
 /** calculates the maximum debt that may be extracted from the Metamask wallet */
-async function calcMaxDebtFromWallet(maker, cdp) {
+export async function calcMaxDebtFromWallet(maker, cdp) {
   const dai = maker.service('token').getToken('ETH');
   const defaultAccount = maker.service('token').get('web3').currentAccount();
   const ethBalance = await dai.balanceOf(defaultAccount);
@@ -74,11 +74,11 @@ async function calcMaxDebtFromWallet(maker, cdp) {
   const price = maker.service('price');
   const ethPrice = await price.getEthPrice();
 
-  console.log("eth price = " + ethPrice);
-  console.log("eth balance in wallet = " + ethBalance);
+  // console.log("eth price = " + ethPrice);
+  // console.log("eth balance in wallet = " + ethBalance);
 
   let maxDebt = (ethPrice.toNumber() * ethBalance * 100) / MIN_RATIO;
-  console.log('max debt from Wallet = ' + maxDebt + ' ETH');
+  // console.log('max debt from Wallet = ' + maxDebt + ' ETH');
   return maxDebt;
 }
 
@@ -119,7 +119,7 @@ export const startAsync = () => async dispatch => {
   const cdp = await maker.getCdp(2824);
   console.dir(cdp);
 
-  // total amount of possible debt is the sum of the two below 
+  // total amount of possible debt is the sum of the two below
   await calcMaxDebtInCDP(maker, cdp);
   await calcMaxDebtFromWallet(maker, cdp);
 
