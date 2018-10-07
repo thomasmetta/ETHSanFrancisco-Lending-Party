@@ -201,31 +201,32 @@ class App extends Component {
           <div id="testing" className="ui raised very padded text container segment" ref={(section) => { this.resultPage = section; }}>
             <h1 class="ui header lendContainer">Your Collatoralized Debt Positions</h1>
             <Divider/>
-            <Lottie options={{ animationData: smallTree }} width={450} />
-            <div className="lendContainer firstContainer">
-              <div class="ui card">
-                <div class="content">
-                  <div class="meta">TOTAL AMOUNT IN CDP</div>
-                  <br />
-                  <div class="header">${this.state.maxDebt}</div>
+            <div>
+              <div className="lendContainer firstContainer">
+              <Lottie options={{ animationData: smallTree }} width={450} />
+                <div class="ui card">
+                  <div class="content">
+                    <div class="meta">TOTAL AMOUNT IN CDP</div>
+                    <br />
+                    <div class="header">${this.state.maxDebt}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <Lottie options={{ animationData: bigTree }} width={450} />
-            <div className = "lendContainer firstContainer">
-              <div class="ui card">
-                <div class="content">
-                  <div class="meta">TOTAL AMOUNT LOANABLE </div>
-                  <br />
-                  <div class="header">${this.state.maxDebtCombined}</div>
+              <div className = "lendContainer firstContainer">
+                <Lottie options={{ animationData: bigTree }} width={450} />
+                <div class="ui card">
+                  <div class="content">
+                    <div class="meta">TOTAL AMOUNT LOANABLE </div>
+                    <br />
+                    <div class="header">${this.state.maxDebtCombined}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className = "lendContainer firstContainer">
             </div>
             <br />
-            <div>
+            <div className>
                 <PieChart
+                style={{ height: '250px' }}
                 data={[{ value: 1, key: 1, color: 'turquoise' }]}
                 reveal={this.state.percentage}
                 lineWidth={20}
@@ -241,8 +242,9 @@ class App extends Component {
                 style={{ width: '100%' }}
                 onChange={this.handleRangeChange}
                 />
-                div
-                <Button size="massive" color="teal" onClick={()=>this.handleClick(this.state.valueToSubmit)}>Go</Button>
+                <div className="lendContainer">
+                  <Button size="massive" color="teal" onClick={()=>this.handleClick(this.state.valueToSubmit)}>Go</Button>
+                </div>
             </div>
 
             {this.state.showDialog &&
