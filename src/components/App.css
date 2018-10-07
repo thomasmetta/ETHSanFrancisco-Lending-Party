@@ -1,5 +1,5 @@
 .App {
-  text-align: center;
+  /* text-align: center; */
 }
 
 .App-logo {
@@ -15,7 +15,8 @@
 }
 
 .App-title {
-  font-size: 1.5em;
+  text-align: center;
+  font-size: 4em;
   color: #6067f1;
 }
 
@@ -28,13 +29,32 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 40px;
+  color: white;
 }
 
-.app-head-container {
+#turquoise {
+  background-color: turquoise;
+}
+
+#app-head-container {
   display: flex;
   height: 86vh;
   justify-content: center;
   align-items: center;
+  background-color:#66e6d9;
+  min-height: 100%;
+}
+
+.arrow-down {
+  position: absolute;
+  right: 50%;
+  bottom: 3%;
+  background-color: lightgray;
+  border-radius: 20px;
+  z-index: 1000;
+}
+.arrow-down:hover {
+  cursor: pointer;
 }
 
 .lendText {
@@ -42,6 +62,10 @@
   margin-bottom: 20px;
   font-size: 2em;
   color: #6067f1;
+}
+
+#qr-container {
+  text-align: center;
 }
 
 .lendTextContainer {

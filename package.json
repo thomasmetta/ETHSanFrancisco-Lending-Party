@@ -10,6 +10,7 @@
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-lottie": "^1.2.3",
+    "react-minimal-pie-chart": "^3.3.0",
     "react-redux": "^5.0.7",
     "react-scripts": "2.0.4",
     "react-scroll-to": "^1.2.2",
