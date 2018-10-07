@@ -117,7 +117,7 @@ class App extends Component {
               width={450}
             />
           </div>
-          Amount: <Input focus placeholder='Search...' />
+          Amount: <Input focus placeholder='Enter dollar amount...' />
           <Button>Go</Button>
           <Divider/>
           </div>
