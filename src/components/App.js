@@ -123,7 +123,7 @@ class App extends Component {
     axios.post(ENDPOINT+'wyre', {
       amount
     })
-    .then(data => console.log('dat data', data));
+    .then(data => window.open('https://www.testwyre.com/dashboard', "_blank"));
   }
 
   async componentDidMount() {
